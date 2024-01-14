@@ -1,0 +1,9 @@
+[repository]
+name = "HyprlandDualMonitorWorkspaces"
+authors = ["fmbellomy"]
+[plugin-HyprlandDualMonitorWorkspaces]
+authors = ["fmbellomy"]
+output = "hyperland-dual-monitor-workspaces.so"
+build = [
+  "make all"
+]
