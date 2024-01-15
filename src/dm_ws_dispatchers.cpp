@@ -8,6 +8,7 @@
 #include <hyprland/src/helpers/Workspace.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 std::map<uint64_t, typename std::vector<std::string>> monitor_workspace_map;
@@ -35,38 +36,45 @@ void map_workspaces_to_monitors() {
   int ws_idx = 1;
   int num_monitors = g_pCompositor->m_vMonitors.size();
   for (int j = 0; j < num_monitors; j++) {
+
     auto monitor = g_pCompositor->m_vMonitors.at(j);
     int ws_count =
         g_pConfigManager->getConfigValuePtrSafe(k_ws_count)->intValue;
-    std::string log_msg = "[dm_ws] Mapping workspaces " +
-                          std::to_string(ws_idx) + "-" +
-                          std::to_string(ws_idx + ws_count - 1) +
-                          " to monitor " + monitor->szName;
-    HyprlandAPI::addNotification(PHANDLE, log_msg, catppuccin_mocha_mauve,
-                                 5000);
-    for (int i = ws_idx; i < ws_count; i++) {
+    for (int i = ws_idx; i <= ws_count; i++) {
       // i love off-by-one errors.
       std::string ws_name = std::to_string((j + 1) + num_monitors * (i - 1));
       monitor_workspace_map[monitor->ID].push_back(ws_name);
-      HyprlandAPI::invokeHyprctlCommand("keyword", "workspace " + ws_name +
-                                                       "," + monitor->szName);
-      CWorkspace *workspace = g_pCompositor->getWorkspaceByName(ws_name);
 
+      // for whatever reason, this completely did not work.
+      // HyprlandAPI::invokeHyprctlCommand("keyword", "workspace " + ws_name +
+      //                                                  "," +
+      //                                                  monitor->szName);
+
+      CWorkspace *workspace = g_pCompositor->getWorkspaceByName(ws_name);
       if (workspace != nullptr) {
         g_pCompositor->moveWorkspaceToMonitor(workspace, monitor.get());
       }
     }
-    // prepare for the next set of workspaces
-    ws_idx += ws_count;
   }
+  /* now unnecessary debug print :3
+    for (auto monitor : g_pCompositor->m_vMonitors) {
+    std::stringstream log_msg;
+    log_msg << "[dm_ws] Mapped workspaces (";
+    for (auto mapping : monitor_workspace_map[monitor->ID]) {
+      log_msg << mapping << ",";
+    }
+    log_msg << ") to monitor " + monitor->szName;
+    HyprlandAPI::addNotification(PHANDLE, log_msg.str(), catppuccin_mocha_mauve,
+                                 5000);
+  }*/
 }
 void refresh_mapping(void *, SCallbackInfo &, std::any) {
   map_workspaces_to_monitors();
 }
 void clear_mapping() { monitor_workspace_map.clear(); }
 void dm_workspace(std::string workspace) {
-  std::vector<std::shared_ptr<CMonitor>> monitors = g_pCompositor->m_vMonitors;
-  int ws_count = g_pConfigManager->getConfigValuePtrSafe(k_ws_count)->intValue;
+  int ws = std::stoi(workspace);
+  auto monitors = g_pCompositor->m_vMonitors;
   CMonitor *active_monitor = g_pCompositor->getMonitorFromCursor();
   int active_monitor_pos = 0;
   for (uint64_t i = 0; i < monitors.size(); i++) {
@@ -74,14 +82,23 @@ void dm_workspace(std::string workspace) {
       active_monitor_pos = i;
       continue;
     }
+    HyprlandAPI::addNotification(
+        PHANDLE,
+        "going to: " + std::to_string((ws - 1) * monitors.size() + (i + 1)),
+        catppuccin_mocha_mauve, 5000);
     HyprlandAPI::invokeHyprctlCommand(
         "dispatch",
-        "workspace " + std::to_string(std::stoi(workspace) + (i * ws_count)));
+        "workspace " + std::to_string((ws - 1) * monitors.size() + (i + 1)));
   }
+
+  HyprlandAPI::addNotification(
+      PHANDLE,
+      "going to: " +
+          std::to_string((ws - 1) * monitors.size() + (active_monitor_pos + 1)),
+      catppuccin_mocha_mauve, 5000);
   HyprlandAPI::invokeHyprctlCommand(
-      "dispatch",
-      "workspace " + std::to_string(std::stoi(workspace) +
-                                    (active_monitor_pos * ws_count)));
+      "dispatch", "workspace " + std::to_string((ws - 1) * monitors.size() +
+                                                (active_monitor_pos + 1)));
 }
 void dm_move_to_workspace(std::string workspace) {
   CMonitor *monitor = g_pCompositor->getMonitorFromCursor();
