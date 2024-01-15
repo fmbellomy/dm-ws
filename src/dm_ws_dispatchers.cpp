@@ -5,14 +5,18 @@
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/config/ConfigManager.hpp>
 #include <hyprland/src/helpers/Color.hpp>
+#include <hyprland/src/helpers/Vector2D.hpp>
 #include <hyprland/src/helpers/Workspace.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 std::map<uint64_t, typename std::vector<std::string>> monitor_workspace_map;
-
+static const Vector2D parse_hyprctl_cursorpos(std::string input) {
+  int split_point = input.find(",");
+  return {std::stoi(input.substr(0, split_point)),
+          std::stoi(input.substr(split_point, input.length()))};
+}
 const std::string &get_workspace_from_monitor(CMonitor *monitor,
                                               const std::string &workspace) {
   int ws_idx = 0;
@@ -33,12 +37,12 @@ const std::string &get_workspace_from_monitor(CMonitor *monitor,
 }
 void map_workspaces_to_monitors() {
   monitor_workspace_map.clear();
-  int ws_idx = 1;
-  int num_monitors = g_pCompositor->m_vMonitors.size();
+  const int ws_idx = 1;
+  const int num_monitors = g_pCompositor->m_vMonitors.size();
   for (int j = 0; j < num_monitors; j++) {
 
-    auto monitor = g_pCompositor->m_vMonitors.at(j);
-    int ws_count =
+    const auto monitor = g_pCompositor->m_vMonitors.at(j);
+    const int ws_count =
         g_pConfigManager->getConfigValuePtrSafe(k_ws_count)->intValue;
     for (int i = ws_idx; i <= ws_count; i++) {
       // i love off-by-one errors.
@@ -73,9 +77,11 @@ void refresh_mapping(void *, SCallbackInfo &, std::any) {
 }
 void clear_mapping() { monitor_workspace_map.clear(); }
 void dm_workspace(std::string workspace) {
-  int ws = std::stoi(workspace);
-  auto monitors = g_pCompositor->m_vMonitors;
-  CMonitor *active_monitor = g_pCompositor->getMonitorFromCursor();
+  const int ws = std::stoi(workspace);
+  const auto monitors = g_pCompositor->m_vMonitors;
+  const CMonitor *active_monitor = g_pCompositor->getMonitorFromCursor();
+  const auto cursor_coords = parse_hyprctl_cursorpos(
+      HyprlandAPI::invokeHyprctlCommand("cursorpos", ""));
   int active_monitor_pos = 0;
   for (uint64_t i = 0; i < monitors.size(); i++) {
     if (monitors.at(i)->ID == active_monitor->ID) {
@@ -92,6 +98,7 @@ void dm_workspace(std::string workspace) {
     HyprlandAPI::invokeHyprctlCommand(
         "dispatch",
         "workspace " + std::to_string((ws - 1) * monitors.size() + (i + 1)));
+    g_pCompositor->warpCursorTo(cursor_coords);
   }
 
   /*
@@ -103,7 +110,8 @@ void dm_workspace(std::string workspace) {
   */
   HyprlandAPI::invokeHyprctlCommand(
       "dispatch", "workspace " + std::to_string((ws - 1) * monitors.size() +
-                                                (active_monitor_pos + 1)));
+                                                g_pCompositor->warpCursorTo()(
+                                                    active_monitor_pos + 1)));
 }
 void dm_move_to_workspace(std::string workspace) {
   CMonitor *monitor = g_pCompositor->getMonitorFromCursor();
