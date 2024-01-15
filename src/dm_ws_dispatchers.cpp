@@ -99,7 +99,7 @@ void dm_workspace(std::string workspace) {
     HyprlandAPI::invokeHyprctlCommand(
         "dispatch",
         "workspace " + std::to_string((ws - 1) * monitors.size() + (i + 1)));
-    g_pCompositor->warpCursorTo(cursor_coords);
+    // g_pCompositor->warpCursorTo(cursor_coords);
   }
 
   /*
