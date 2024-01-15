@@ -12,7 +12,7 @@ because I'm more familiar with programming in that style, bug prone as it may be
 
 ## Do you really want to install this janky disaster?
 
-If you *really* want to use this plugin, you can install it with hyprpm as follows.
+If you *really* want to use this plugin, you can install it with hyprpm as follows:
 
 ```bash
 hyprpm add https://github.com/fmbellomy/dm-ws
