@@ -82,10 +82,13 @@ void dm_workspace(std::string workspace) {
       active_monitor_pos = i;
       continue;
     }
-    HyprlandAPI::addNotification(
+
+    /*
+       HyprlandAPI::addNotification(
         PHANDLE,
         "going to: " + std::to_string((ws - 1) * monitors.size() + (i + 1)),
         catppuccin_mocha_mauve, 5000);
+    */
     HyprlandAPI::invokeHyprctlCommand(
         "dispatch",
         "workspace " + std::to_string((ws - 1) * monitors.size() + (i + 1)));
