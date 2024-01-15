@@ -107,13 +107,15 @@ void dm_workspace(std::string workspace) {
 }
 void dm_move_to_workspace(std::string workspace) {
   CMonitor *monitor = g_pCompositor->getMonitorFromCursor();
+  int ws = std::stoi(workspace);
   HyprlandAPI::invokeHyprctlCommand(
-      "dispatch", "movetoworkspace " +
-                      monitor_workspace_map[monitor->ID][std::stoi(workspace)]);
+      "dispatch",
+      "movetoworkspace " + monitor_workspace_map[monitor->ID][ws - 1]);
 }
 void dm_move_to_workspace_silent(std::string workspace) {
   CMonitor *monitor = g_pCompositor->getMonitorFromCursor();
+  int ws = std::stoi(workspace);
   HyprlandAPI::invokeHyprctlCommand(
-      "dispatch", "movetoworkspacesilent " +
-                      monitor_workspace_map[monitor->ID][std::stoi(workspace)]);
+      "dispatch",
+      "movetoworkspacesilent " + monitor_workspace_map[monitor->ID][ws - 1]);
 }
