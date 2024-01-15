@@ -14,8 +14,9 @@
 std::map<uint64_t, typename std::vector<std::string>> monitor_workspace_map;
 static const Vector2D parse_hyprctl_cursorpos(std::string input) {
   int split_point = input.find(",");
-  return {std::stoi(input.substr(0, split_point)),
-          std::stoi(input.substr(split_point, input.length()))};
+  return {static_cast<double>(std::stoi(input.substr(0, split_point))),
+          static_cast<double>(
+              std::stoi(input.substr(split_point, input.length())))};
 }
 const std::string &get_workspace_from_monitor(CMonitor *monitor,
                                               const std::string &workspace) {
@@ -110,8 +111,7 @@ void dm_workspace(std::string workspace) {
   */
   HyprlandAPI::invokeHyprctlCommand(
       "dispatch", "workspace " + std::to_string((ws - 1) * monitors.size() +
-                                                g_pCompositor->warpCursorTo()(
-                                                    active_monitor_pos + 1)));
+                                                (active_monitor_pos + 1)));
 }
 void dm_move_to_workspace(std::string workspace) {
   CMonitor *monitor = g_pCompositor->getMonitorFromCursor();
