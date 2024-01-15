@@ -37,6 +37,10 @@ const std::string &get_workspace_from_monitor(CMonitor *monitor,
   return monitor_workspace_map[monitor->ID][ws_idx];
 }
 void map_workspaces_to_monitors() {
+
+  HyprlandAPI::addNotification(
+      PHANDLE, HyprlandAPI::invokeHyprctlCommand("cursorpos", ""),
+      catppuccin_mocha_mauve, 5000);
   monitor_workspace_map.clear();
   const int ws_idx = 1;
   const int num_monitors = g_pCompositor->m_vMonitors.size();
@@ -81,8 +85,8 @@ void dm_workspace(std::string workspace) {
   const int ws = std::stoi(workspace);
   const auto monitors = g_pCompositor->m_vMonitors;
   const CMonitor *active_monitor = g_pCompositor->getMonitorFromCursor();
-  // const auto cursor_coords = parse_hyprctl_cursorpos(
-  //     HyprlandAPI::invokeHyprctlCommand("cursorpos", ""));
+  Vector2D cursor_coords = parse_hyprctl_cursorpos(
+      HyprlandAPI::invokeHyprctlCommand("cursorpos", ""));
   int active_monitor_pos = 0;
   for (uint64_t i = 0; i < monitors.size(); i++) {
     if (monitors.at(i)->ID == active_monitor->ID) {
