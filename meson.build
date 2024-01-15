@@ -2,7 +2,7 @@ project('hyprland-dual-monitor-workspaces', 'cpp',
   version: '0.1',
   default_options: ['buildtype=release'],
 )
-
+incdir = include_directories('include')
 cpp_compiler = meson.get_compiler('cpp')
 if cpp_compiler.has_argument('-std=c++23')
   add_global_arguments('-std=c++23', language: 'cpp')
@@ -11,10 +11,10 @@ elif cpp_compiler.has_argument('-std=c++2b')
 else
   error('Could not configure current C++ compiler (' + cpp_compiler.get_id() + ' ' + cpp_compiler.version() + ') with required C++ standard (C++23)')
 endif
-
 add_project_arguments(
   [
     '-Wno-narrowing',
+    '-DWLR_USE_UNSTABLE'
   ],
   language: 'cpp')
 
@@ -24,6 +24,7 @@ src = globber.stdout().strip().split('\n')
 hyprland = dependency('hyprland')
 
 shared_module(meson.project_name(), src,
+  include_directories : incdir,
   dependencies: [
     dependency('hyprland'),
     dependency('pixman-1'),
