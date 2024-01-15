@@ -33,7 +33,9 @@ const std::string &get_workspace_from_monitor(CMonitor *monitor,
 void map_workspaces_to_monitors() {
   monitor_workspace_map.clear();
   int ws_idx = 1;
-  for (auto &monitor : g_pCompositor->m_vMonitors) {
+  int num_monitors = g_pCompositor->m_vMonitors.size();
+  for (int j = 0; j < num_monitors; j++) {
+    auto monitor = g_pCompositor->m_vMonitors.at(j);
     int ws_count =
         g_pConfigManager->getConfigValuePtrSafe(k_ws_count)->intValue;
     std::string log_msg = "[dm_ws] Mapping workspaces " +
@@ -42,10 +44,9 @@ void map_workspaces_to_monitors() {
                           " to monitor " + monitor->szName;
     HyprlandAPI::addNotification(PHANDLE, log_msg, catppuccin_mocha_mauve,
                                  5000);
-
     for (int i = ws_idx; i < ws_count; i++) {
-      printf("ws_idx: %d | ws_count: %d | i: %d\n", ws_idx, ws_count, i);
-      std::string ws_name = std::to_string(i);
+      // i love off-by-one errors.
+      std::string ws_name = std::to_string((j + 1) + num_monitors * (i - 1));
       monitor_workspace_map[monitor->ID].push_back(ws_name);
       HyprlandAPI::invokeHyprctlCommand("keyword", "workspace " + ws_name +
                                                        "," + monitor->szName);
@@ -59,7 +60,7 @@ void map_workspaces_to_monitors() {
     ws_idx += ws_count;
   }
 }
-void refresh_mapping(void *, SCallbackInfo &, std::any) {
+void refreshmapapping(void *, SCallbackInfo &, std::any) {
   map_workspaces_to_monitors();
 }
 void clear_mapping() { monitor_workspace_map.clear(); }
