@@ -43,7 +43,8 @@ void map_workspaces_to_monitors() {
     HyprlandAPI::addNotification(PHANDLE, log_msg, catppuccin_mocha_mauve,
                                  5000);
 
-    for (int i = ws_idx; i < ws_idx + ws_count; i++) {
+    for (int i = ws_idx; i < ws_count; i++) {
+      printf("ws_idx: %d | ws_count: %d | i: %d\n", ws_idx, ws_count, i);
       std::string ws_name = std::to_string(i);
       monitor_workspace_map[monitor->ID].push_back(ws_name);
       HyprlandAPI::invokeHyprctlCommand("keyword", "workspace " + ws_name +
@@ -53,9 +54,9 @@ void map_workspaces_to_monitors() {
       if (workspace != nullptr) {
         g_pCompositor->moveWorkspaceToMonitor(workspace, monitor.get());
       }
-      // prepare for the next set of workspaces
-      ws_idx += ws_count;
     }
+    // prepare for the next set of workspaces
+    ws_idx += ws_count;
   }
 }
 void refresh_mapping(void *, SCallbackInfo &, std::any) {
