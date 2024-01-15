@@ -67,7 +67,7 @@ void dm_workspace(std::string workspace) {
   int ws_count = g_pConfigManager->getConfigValuePtrSafe(k_ws_count)->intValue;
   CMonitor *active_monitor = g_pCompositor->getMonitorFromCursor();
   int active_monitor_pos = 0;
-  for (int i = 0; i < monitors.size(); i++) {
+  for (uint64_t i = 0; i < monitors.size(); i++) {
     if (monitors.at(i)->ID == active_monitor->ID) {
       active_monitor_pos = i;
       continue;
