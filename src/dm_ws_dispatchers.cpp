@@ -1,7 +1,7 @@
+#include "dm_ws_dispatchers.hpp"
 #include "globals.hpp"
 #include <cstddef>
 #include <cstdint>
-#include <dm_ws_dispatchers.hpp>
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/config/ConfigManager.hpp>
 #include <hyprland/src/helpers/Color.hpp>
@@ -60,7 +60,7 @@ void map_workspaces_to_monitors() {
     ws_idx += ws_count;
   }
 }
-void refreshmapapping(void *, SCallbackInfo &, std::any) {
+void refresh_mapping(void *, SCallbackInfo &, std::any) {
   map_workspaces_to_monitors();
 }
 void clear_mapping() { monitor_workspace_map.clear(); }
