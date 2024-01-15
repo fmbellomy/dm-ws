@@ -2,11 +2,17 @@
 #include "globals.hpp"
 #include <hyprland/src/config/ConfigManager.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 APICALL EXPORT std::string PLUGIN_API_VERSION() { return HYPRLAND_API_VERSION; }
+#pragma clang diagnostic pop
 
 static HOOK_CALLBACK_FN *e_monitorAddedHandle = nullptr;
 static HOOK_CALLBACK_FN *e_monitorRemovedHandle = nullptr;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
   PHANDLE = handle;
 
@@ -35,7 +41,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
           "life features for paired "
           "workspaces on dual monitor setups."};
 }
-
+#pragma clang diagnostic pop
 APICALL EXPORT void PLUGIN_EXIT() {
   HyprlandAPI::addNotification(PHANDLE, "[dm-ws] Unloaded successfully!",
                                catppuccin_mocha_mauve, 5000);
